@@ -14,7 +14,7 @@ def GetDataDir():
 """
 Helper Method used to get all data from request string.
 """
-def RetrieveData(request):
+def RetrieveData(request):    
   connection = httplib.HTTPSConnection("visualgenome.org", '443')
   connection.request("GET", request)
   response = connection.getresponse()
@@ -61,22 +61,31 @@ def ParseGraph(data, image):
 """
 Helper to parse the image data for one image.
 """
-def ParseImageData(data):
+def ParseImageData(data, api_version=1.0):
+  id_string = 'id'
+  if api_version > 1.0:
+      id_string = 'image_id'
+  
   url = data['url']
   width = data['width']
   height = data['height']
   coco_id = data['coco_id']
   flickr_id = data['flickr_id']
-  image = Image(data['image_id'], url, width, height, coco_id, flickr_id)
+  
+  image = Image(data[id_string], url, width, height, coco_id, flickr_id)
   return image	
 
 """
 Helper to parse region descriptions.
 """
-def ParseRegionDescriptions(data, image):
+def ParseRegionDescriptions(data, image, api_version=1.0):
+  id_string = 'id'
+  if api_version > 1.0:
+      id_string = 'region_id' 
+  
   regions = []
   for d in data:
-    regions.append(Region(d['region_id'], image, d['phrase'], d['x'], d['y'], d['width'], d['height']))
+    regions.append(Region(d[id_string], image, d['phrase'], d['x'], d['y'], d['width'], d['height']))
   return regions
 
 """
@@ -91,18 +100,27 @@ def ParseObjects(data, image):
 """
 Helper to parse a list of question answers.
 """
-def ParseQA(data, image):
+def ParseQA(data, image, api_version=1.0):
+    
+  qobj_string = 'question_objects'
+  aobj_string = 'answer_objects' 
+  id_string = 'id'
+  if api_version > 1.0:
+      qobj_string = 'q_objects'
+      aobj_string = 'a_objects' 
+      id_string = 'qa_id'
+    
   qas = []
   for d in data:
     qos = []
     aos = []
-    if 'q_objects' in d:
-      for qo in d['q_objects']:
+    if qobj_string in d:
+      for qo in d[qobj_string]:
         synset = Synset(qo['synset_name'], qo['synset_definition'])
         qos.append(QAObject(qo['entity_idx_start'], qo['entity_idx_end'], qo['entity_name'], synset))
-    if 'a_objects' in d:
-      for ao in d['a_objects']:
+    if aobj_string in d:
+      for ao in d[aobj_string]:
         synset = Synset(o['synset_name'], ao['synset_definition'])
         aos.append(QAObject(ao['entity_idx_start'], ao['entity_idx_end'], ao['entity_name'], synset))
-    qas.append(QA(d['qa_id'], image, d['question'], d['answer'], qos, aos))
+    qas.append(QA(d[id_string], image, d['question'], d['answer'], qos, aos))
   return qas 
