@@ -67,7 +67,7 @@ def ParseImageData(data):
   height = data['height']
   coco_id = data['coco_id']
   flickr_id = data['flickr_id']
-  image = Image(data['id'], url, width, height, coco_id, flickr_id)
+  image = Image(data['image_id'], url, width, height, coco_id, flickr_id)
   return image	
 
 """
@@ -76,7 +76,7 @@ Helper to parse region descriptions.
 def ParseRegionDescriptions(data, image):
   regions = []
   for d in data:
-    regions.append(Region(d['id'], image, d['phrase'], d['x'], d['y'], d['width'], d['height']))
+    regions.append(Region(d['region_id'], image, d['phrase'], d['x'], d['y'], d['width'], d['height']))
   return regions
 
 """
@@ -87,13 +87,13 @@ def ParseQA(data, image_map):
   for d in data:
     qos = []
     aos = []
-    if 'question_objects' in d:
-      for qo in d['question_objects']:
+    if 'q_objects' in d:
+      for qo in d['q_objects']:
         synset = Synset(qo['synset_name'], qo['synset_definition'])
         qos.append(QAObject(qo['entity_idx_start'], qo['entity_idx_end'], qo['entity_name'], synset))
-    if 'answer_objects' in d:
-      for ao in d['answer_objects']:
+    if 'a_objects' in d:
+      for ao in d['a_objects']:
         synset = Synset(o['synset_name'], ao['synset_definition'])
         aos.append(QAObject(ao['entity_idx_start'], ao['entity_idx_end'], ao['entity_name'], synset))
-    qas.append(QA(d['id'], image_map[d['image']], d['question'], d['answer'], qos, aos))
+    qas.append(QA(d['qa_id'], image_map[d['image_id']], d['question'], d['answer'], qos, aos))
   return qas 
