@@ -1,4 +1,4 @@
-from models import Image, Object, Attribute, Relationship
+from models import Image, Object, PlainObject, Attribute, Relationship
 from models import Region, Graph, QA, QAObject, Synset
 import httplib
 import json
@@ -80,9 +80,18 @@ def ParseRegionDescriptions(data, image):
   return regions
 
 """
+Helper to parse object descriptions.
+"""
+def ParseObjects(data, image):
+  objects = []
+  for d in data:
+    objects.append(PlainObject(d['id'], image, d['x'], d['y'], d['w'], d['h'], d['names']))
+  return objects
+
+"""
 Helper to parse a list of question answers.
 """
-def ParseQA(data, image_map):
+def ParseQA(data, image):
   qas = []
   for d in data:
     qos = []
@@ -95,5 +104,5 @@ def ParseQA(data, image_map):
       for ao in d['a_objects']:
         synset = Synset(o['synset_name'], ao['synset_definition'])
         aos.append(QAObject(ao['entity_idx_start'], ao['entity_idx_end'], ao['entity_name'], synset))
-    qas.append(QA(d['qa_id'], image_map[d['image_id']], d['question'], d['answer'], qos, aos))
+    qas.append(QA(d['qa_id'], image, d['question'], d['answer'], qos, aos))
   return qas 

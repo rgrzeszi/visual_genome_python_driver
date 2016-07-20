@@ -27,8 +27,8 @@ class Image:
 
 """
 Region.
-  image 		       int
   phrase           string
+  image            Image
   x                int
   y                int
   width            int
@@ -85,6 +85,34 @@ class Object:
     self.names = names
     self.synsets = synsets
 
+  def __str__(self):
+    name = self.names[0] if len(self.names) != 0 else 'None'
+    return '%s' % (name)
+
+  def __repr__(self):
+    return str(self)
+
+"""
+A plain object container - as extracted from objects.json
+Without synsets, but it also contains the image container
+  id         int
+  image      Image
+  x          int
+  y          int
+  width      int
+  height     int
+  names      string array
+"""
+class PlainObject:
+  def __init__(self, id, image, x, y, width, height, names):
+    self.id = id
+    self.image = image
+    self.x = x
+    self.y = y
+    self.width = width
+    self.height = height
+    self.names = names
+    
   def __str__(self):
     name = self.names[0] if len(self.names) != 0 else 'None'
     return '%s' % (name)

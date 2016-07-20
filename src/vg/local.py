@@ -47,6 +47,23 @@ def GetAllQAs(dataDir=None):
   images = json.load(open(dataFile))
   output = []
   for image in images:
-    output.append(utils.ParseQA(image['qas'], imageMap))
+    output.append(utils.ParseQA(image['qas'], imageMap[image['id']]))
+  return output
+  
+"""
+Get all objects.
+"""
+def GetAllObjects(dataDir=None):
+  if dataDir is None:
+    dataDir = utils.GetDataDir()
+  dataFile = os.path.join(dataDir, 'objects.json')
+  imageData = GetAllImageData(dataDir)
+  imageMap = {}
+  for d in imageData:
+    imageMap[d.id] = d
+  images = json.load(open(dataFile))
+  output = []
+  for image in images:
+    output.append(utils.ParseObjects(image['objects'], imageMap[image['id']]))
   return output
 
